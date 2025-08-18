@@ -14,9 +14,8 @@ import {
   Moon,
   Sun,
 } from "lucide-react";
-
+import AdvancedFormManager from "../components/AdvancedFormManager";
 import { useTheme } from "../ThemeContext";
-
 const DoctorDashboard = () => {
   const { classes, darkMode, toggleDarkMode } = useTheme();
   const [activeTab, setActiveTab] = useState("users");
@@ -57,6 +56,24 @@ const DoctorDashboard = () => {
       gender: "أنثى",
       governorate: "القاهرة",
       joinDate: "2024-02-10",
+    },
+    {
+      id: 5,
+      name: "عبد الرحمن مزروع",
+      age: 13,
+      type: "رياضي",
+      gender: "ذكر",
+      governorate: "بورسعيد",
+      joinDate: "2012-04-04",
+    },
+    {
+      id: 6,
+      name: "مروان اسلام",
+      age: 16,
+      type: "رياضي",
+      gender: "ذكر",
+      governorate: "بورسعيد",
+      joinDate: "2009-01-05",
     },
   ]);
 
@@ -317,17 +334,6 @@ const DoctorDashboard = () => {
                 <FileText className="inline-block ml-2 h-5 w-5" />
                 النماذج
               </button>
-              <button
-                onClick={() => setActiveTab("responses")}
-                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ${
-                  activeTab === "responses"
-                    ? "border-blue-500 text-blue-600"
-                    : `border-transparent ${classes.tabs}`
-                }`}
-              >
-                <BarChart3 className="inline-block ml-2 h-5 w-5" />
-                الاستجابات
-              </button>
             </nav>
           </div>
         </div>
@@ -482,431 +488,7 @@ const DoctorDashboard = () => {
           </div>
         )}
 
-        {activeTab === "forms" && (
-          <div className="space-y-6">
-            {!showFormBuilder && (
-              <div
-                className={`rounded-xl shadow-lg p-6 transition-colors duration-300 ${
-                  darkMode ? "bg-gray-800" : "bg-white"
-                }`}
-              >
-                <div className="flex justify-between items-center mb-6">
-                  <h2
-                    className={`text-xl font-bold ${
-                      darkMode ? "text-white" : "text-gray-900"
-                    }`}
-                  >
-                    النماذج المتاحة
-                  </h2>
-                  <button
-                    onClick={() => setShowFormBuilder(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors duration-200"
-                  >
-                    <PlusCircle className="ml-2 h-5 w-5" />
-                    إنشاء نموذج جديد
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {forms.map((form) => (
-                    <div
-                      key={form.id}
-                      className={`border rounded-lg p-6 hover:shadow-md transition-all duration-300 ${
-                        darkMode
-                          ? "border-gray-700 bg-gray-750 hover:bg-gray-700"
-                          : "border-gray-200 hover:shadow-md"
-                      }`}
-                    >
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <h3
-                            className={`text-lg font-semibold ${
-                              darkMode ? "text-white" : "text-gray-900"
-                            }`}
-                          >
-                            {form.title}
-                          </h3>
-                          <p
-                            className={`text-sm mt-1 ${
-                              darkMode ? "text-gray-300" : "text-gray-600"
-                            }`}
-                          >
-                            {form.description}
-                          </p>
-                        </div>
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => editForm(form)}
-                            className={`p-1 transition-colors duration-200 ${
-                              darkMode
-                                ? "text-blue-400 hover:text-blue-300"
-                                : "text-blue-600 hover:text-blue-800"
-                            }`}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => deleteForm(form.id)}
-                            className={`p-1 transition-colors duration-200 ${
-                              darkMode
-                                ? "text-red-400 hover:text-red-300"
-                                : "text-red-600 hover:text-red-800"
-                            }`}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </div>
-                      <div
-                        className={`text-sm mb-4 ${
-                          darkMode ? "text-gray-400" : "text-gray-500"
-                        }`}
-                      >
-                        <Calendar className="inline-block ml-1 h-4 w-4" />
-                        تم الإنشاء في: {form.createdDate}
-                      </div>
-                      <div
-                        className={`text-sm ${
-                          darkMode ? "text-gray-300" : "text-gray-700"
-                        }`}
-                      >
-                        عدد الحقول: {form.fields.length}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Form Builder */}
-            {showFormBuilder && (
-              <div
-                className={`rounded-xl shadow-lg p-6 transition-colors duration-300 ${
-                  darkMode ? "bg-gray-800" : "bg-white"
-                }`}
-              >
-                <div className="flex justify-between items-center mb-6">
-                  <h2
-                    className={`text-xl font-bold ${
-                      darkMode ? "text-white" : "text-gray-900"
-                    }`}
-                  >
-                    {currentForm ? "تعديل النموذج" : "إنشاء نموذج جديد"}
-                  </h2>
-                  <button
-                    onClick={() => {
-                      setShowFormBuilder(false);
-                      resetFormBuilder();
-                    }}
-                    className={`transition-colors duration-200 ${
-                      darkMode
-                        ? "text-gray-400 hover:text-gray-200"
-                        : "text-gray-600 hover:text-gray-800"
-                    }`}
-                  >
-                    إلغاء
-                  </button>
-                </div>
-
-                <div className="space-y-6">
-                  <div>
-                    <label
-                      className={`block text-sm font-medium mb-2 ${
-                        darkMode ? "text-gray-300" : "text-gray-700"
-                      }`}
-                    >
-                      عنوان النموذج
-                    </label>
-                    <input
-                      type="text"
-                      value={formTitle}
-                      onChange={(e) => setFormTitle(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 ${
-                        darkMode
-                          ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                          : "bg-white border-gray-300 text-gray-900"
-                      }`}
-                      placeholder="أدخل عنوان النموذج"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      className={`block text-sm font-medium mb-2 ${
-                        darkMode ? "text-gray-300" : "text-gray-700"
-                      }`}
-                    >
-                      وصف النموذج
-                    </label>
-                    <textarea
-                      value={formDescription}
-                      onChange={(e) => setFormDescription(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 ${
-                        darkMode
-                          ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                          : "bg-white border-gray-300 text-gray-900"
-                      }`}
-                      rows="3"
-                      placeholder="أدخل وصف النموذج"
-                    />
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between items-center mb-4">
-                      <label
-                        className={`block text-sm font-medium ${
-                          darkMode ? "text-gray-300" : "text-gray-700"
-                        }`}
-                      >
-                        حقول النموذج
-                      </label>
-                      <button
-                        onClick={addField}
-                        className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200"
-                      >
-                        إضافة حقل
-                      </button>
-                    </div>
-
-                    {formFields.map((field, index) => (
-                      <div
-                        key={field.id}
-                        className={`border rounded-lg p-4 mb-4 transition-colors duration-300 ${
-                          darkMode
-                            ? "border-gray-700 bg-gray-700"
-                            : "border-gray-200"
-                        }`}
-                      >
-                        <div className="flex justify-between items-start mb-3">
-                          <h4
-                            className={`text-sm font-medium ${
-                              darkMode ? "text-gray-300" : "text-gray-700"
-                            }`}
-                          >
-                            حقل {index + 1}
-                          </h4>
-                          <button
-                            onClick={() => removeField(field.id)}
-                            className={`transition-colors duration-200 ${
-                              darkMode
-                                ? "text-red-400 hover:text-red-300"
-                                : "text-red-600 hover:text-red-800"
-                            }`}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div>
-                            <label
-                              className={`block text-xs mb-1 ${
-                                darkMode ? "text-gray-400" : "text-gray-600"
-                              }`}
-                            >
-                              نص الحقل
-                            </label>
-                            <input
-                              type="text"
-                              value={field.label}
-                              onChange={(e) =>
-                                updateField(field.id, { label: e.target.value })
-                              }
-                              className={`w-full px-2 py-1 text-sm border rounded transition-colors duration-200 ${
-                                darkMode
-                                  ? "bg-gray-600 border-gray-500 text-white"
-                                  : "bg-white border-gray-300 text-gray-900"
-                              }`}
-                              placeholder="نص الحقل"
-                            />
-                          </div>
-
-                          <div>
-                            <label
-                              className={`block text-xs mb-1 ${
-                                darkMode ? "text-gray-400" : "text-gray-600"
-                              }`}
-                            >
-                              نوع الحقل
-                            </label>
-                            <select
-                              value={field.type}
-                              onChange={(e) =>
-                                updateField(field.id, { type: e.target.value })
-                              }
-                              className={`w-full px-2 py-1 text-sm border rounded transition-colors duration-200 ${
-                                darkMode
-                                  ? "bg-gray-600 border-gray-500 text-white"
-                                  : "bg-white border-gray-300 text-gray-900"
-                              }`}
-                            >
-                              <option value="text">نص</option>
-                              <option value="number">رقم</option>
-                              <option value="textarea">نص طويل</option>
-                              <option value="select">قائمة اختيار</option>
-                              <option value="checkbox">مربع اختيار</option>
-                            </select>
-                          </div>
-
-                          <div className="flex items-center">
-                            <input
-                              type="checkbox"
-                              checked={field.required}
-                              onChange={(e) =>
-                                updateField(field.id, {
-                                  required: e.target.checked,
-                                })
-                              }
-                              className="ml-2"
-                            />
-                            <label
-                              className={`text-xs ${
-                                darkMode ? "text-gray-400" : "text-gray-600"
-                              }`}
-                            >
-                              مطلوب
-                            </label>
-                          </div>
-                        </div>
-
-                        {field.type === "select" && (
-                          <div className="mt-3">
-                            <label
-                              className={`block text-xs mb-1 ${
-                                darkMode ? "text-gray-400" : "text-gray-600"
-                              }`}
-                            >
-                              الخيارات (مفصولة بفاصلة)
-                            </label>
-                            <input
-                              type="text"
-                              value={field.options?.join(", ") || ""}
-                              onChange={(e) =>
-                                updateField(field.id, {
-                                  options: e.target.value
-                                    .split(",")
-                                    .map((opt) => opt.trim())
-                                    .filter((opt) => opt),
-                                })
-                              }
-                              className={`w-full px-2 py-1 text-sm border rounded transition-colors duration-200 ${
-                                darkMode
-                                  ? "bg-gray-600 border-gray-500 text-white"
-                                  : "bg-white border-gray-300 text-gray-900"
-                              }`}
-                              placeholder="خيار 1, خيار 2, خيار 3"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="flex justify-end space-x-4">
-                    <button
-                      onClick={saveForm}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors duration-200"
-                    >
-                      حفظ النموذج
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === "responses" && (
-          <div
-            className={`rounded-xl shadow-lg p-6 transition-colors duration-300 ${
-              darkMode ? "bg-gray-800" : "bg-white"
-            }`}
-          >
-            <h2
-              className={`text-xl font-bold mb-6 ${
-                darkMode ? "text-white" : "text-gray-900"
-              }`}
-            >
-              استجابات المستخدمين
-            </h2>
-
-            {responses.length === 0 ? (
-              <div
-                className={`text-center py-8 ${
-                  darkMode ? "text-gray-400" : "text-gray-500"
-                }`}
-              >
-                لا توجد استجابات متاحة حالياً
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {responses.map((response) => (
-                  <div
-                    key={response.id}
-                    className={`border rounded-lg p-6 transition-colors duration-300 ${
-                      darkMode ? "border-gray-700" : "border-gray-200"
-                    }`}
-                  >
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3
-                          className={`text-lg font-semibold ${
-                            darkMode ? "text-white" : "text-gray-900"
-                          }`}
-                        >
-                          {response.formTitle}
-                        </h3>
-                        <p
-                          className={`text-sm ${
-                            darkMode ? "text-gray-300" : "text-gray-600"
-                          }`}
-                        >
-                          المستخدم: {response.userName}
-                        </p>
-                      </div>
-                      <div
-                        className={`text-sm ${
-                          darkMode ? "text-gray-400" : "text-gray-500"
-                        }`}
-                      >
-                        <Calendar className="inline-block ml-1 h-4 w-4" />
-                        {response.submittedDate}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {Object.entries(response.responses).map(
-                        ([question, answer]) => (
-                          <div
-                            key={question}
-                            className={`p-3 rounded transition-colors duration-300 ${
-                              darkMode ? "bg-gray-700" : "bg-gray-50"
-                            }`}
-                          >
-                            <p
-                              className={`text-sm font-medium mb-1 ${
-                                darkMode ? "text-gray-300" : "text-gray-700"
-                              }`}
-                            >
-                              {question}
-                            </p>
-                            <p
-                              className={`text-sm ${
-                                darkMode ? "text-white" : "text-gray-900"
-                              }`}
-                            >
-                              {answer}
-                            </p>
-                          </div>
-                        )
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+        {activeTab === "forms" && <AdvancedFormManager />}
       </div>
 
       {/* User Details Modal */}

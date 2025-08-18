@@ -1,1 +1,11 @@
 @import "tailwindcss";
+
+input:focus, select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #3B82F6;
+    border-color: #3B82F6;
+}
+
+select {
+    appearance: none;
+}

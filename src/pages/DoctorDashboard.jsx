@@ -16,7 +16,7 @@ import {
   Sun,
 } from "lucide-react";
 
-import EnhancedFormBuilder from "../components/x";
+import EnhancedFormBuilder from "../components/AdvancedFormManager-2";
 
 import { useTheme } from "../ThemeContext";
 const DoctorDashboard = () => {

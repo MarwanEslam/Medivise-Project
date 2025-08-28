@@ -6,6 +6,7 @@ import React, {
   useReducer,
   createContext,
   useContext,
+  useEffect,
 } from "react";
 import {
   Save,
@@ -49,7 +50,6 @@ import {
 import { useTheme } from "../ThemeContext";
 
 import useCustomFormStore from "../store/useCustomFormStore";
-
 
 const useNotification = () => {
   const [notification, setNotification] = useState(null);
@@ -95,17 +95,21 @@ export default function EnhancedFormBuilder() {
   const showFormBuilder = useCustomFormStore;
   (s) => s.showFormBuilder;
   const setShowFormBuilder = useCustomFormStore((s) => s.setShowFormBuilder);
-
+  const customForms = useCustomFormStore((s) => s.customForms);
+  const setCustomForms = useCustomFormStore((s) => s.setCustomForms);
+  const currentForm = useCustomFormStore((s) => s.currentForm);
+  const setCurrentForm = useCustomFormStore((s) => s.setCurrentForm);
 
   // State Management with useReducer
   const initialState = {
-    forms: [],
-    currentForm: {
+    forms: customForms || [],
+    currentForm: Object.keys(currentForm).length ? currentForm : {
       id: null,
       title: "نموذج جديد",
       description: "",
       fields: [],
       theme: "default",
+      createdDate: null,
       settings: {
         rtl: true,
         validation: true,
@@ -682,8 +686,27 @@ export default function EnhancedFormBuilder() {
               className={`px-3 py-2 text-sm ${classes.buttonPrimary} rounded-lg flex items-center gap-2`}
               onClick={handleSaveAll}
             >
-              <Save size={14} />
-              حفظ
+              {state.currentForm.id ? (
+                <>
+                  <Save size={14} />
+                  تعديل
+                </>
+              ) : (
+                <>
+                  <Save size={14} />
+                  حفظ
+                </>
+              )}
+            </button>
+            <button
+              className={`px-3 py-2 text-sm ${classes.buttonSecondary} rounded-lg flex items-center gap-2`}
+              onClick={() => {
+                setShowFormBuilder(false);
+                setCurrentForm({});
+              }}
+            >
+              <X size={14} />
+              إغلاق
             </button>
           </div>
         </div>
@@ -711,7 +734,7 @@ export default function EnhancedFormBuilder() {
               </div>
             )}
 
-            {state.currentForm.fields.length === 0 ? (
+            {state.currentForm?.fields.length === 0 ? (
               <div
                 className={`text-center py-16 border-2 border-dashed ${classes.cardBorder} rounded-lg`}
               >
@@ -1145,11 +1168,27 @@ export default function EnhancedFormBuilder() {
       return;
     }
 
-    // Simulate save operation
+    if (!state.currentForm.id) {
+      setCustomForms([
+        ...state.forms,
+        {
+          ...state.currentForm,
+          id: `form_${Date.now()}`,
+          createdDate:
+            currentForm?.createdDate || new Date().toLocaleDateString("ar-SA"),
+        },
+      ]);
+    } else {
+      const data = state.forms.map((form) =>
+        form.id === state.currentForm.id ? state.currentForm : form
+      );
+      setCustomForms(data);
+    }
+
     showNotification("تم حفظ النموذج بنجاح", "success");
     // setTimeout(() => onClose(), 1000);
-
-    setShowFormBuilder(false)
+    setShowFormBuilder(false);
+    setCurrentForm({});
   };
 
   // Property Panel Component

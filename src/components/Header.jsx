@@ -20,7 +20,7 @@ const NAVIGATION_ITEMS = [
   { path: "/", label: "الرئيسية", icon: Combine },
   { path: "/data/collect", label: "جمع البيانات", icon: CalendarDays },
   { path: "/doctor/dashboard", label: "لوحة تحكم الطبيب", icon: Activity },
-  { path: "/ai", label: "الذكاء الاصطناعي", icon: Brain },
+  // { path: "/ai", label: "الذكاء الاصطناعي", icon: Brain },
   { path: "/community", label: "المجتمع", icon: MessagesSquare },
   { path: "/info", label: "المعلومات", icon: BookOpenCheck },
 ];

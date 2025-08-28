@@ -7,6 +7,9 @@ const useCustomFormStore = create((set) => ({
   showFormModal: false,
   setShowFormModal: (value) => set({ showFormModal: value }),
 
+  currentForm: {},
+  setCurrentForm: (form) => set({ currentForm: form }),
+
   customForms: [],
   setCustomForms: (forms) => set({ customForms: forms }),
 

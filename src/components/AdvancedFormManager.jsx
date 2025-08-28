@@ -1299,7 +1299,6 @@ const FormBuilder = ({ currentForm = [], onSave, onClose }) => {
   );
 };
 
-
 export default function AdvancedFormManager() {
   const { classes, darkMode } = useTheme();
   // Main States

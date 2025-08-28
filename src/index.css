@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-input:focus, select:focus {
+input:focus, select:focus, textarea:focus {
     outline: none;
     box-shadow: 0 0 0 2px #3B82F6;
     border-color: #3B82F6;
@@ -8,4 +8,26 @@ input:focus, select:focus {
 
 select {
     appearance: none;
+}
+
+
+
+
+@layer base {
+
+    /* Light Mode */
+    ::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: transparent;
+    }
+
+    ::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+
+
 }

@@ -1,81 +1,47 @@
 import React, { useState, useMemo, createContext, useContext } from "react";
+import { Listbox } from "@headlessui/react";
 import {
   ChevronLeft,
   ChevronRight,
-  ChevronDown,
   Search,
   Plus,
   Save,
+  ChevronDown,
+  Check,
   X,
   Moon,
   Sun,
 } from "lucide-react";
 import CustomSelect from "../components/CustomSelect";
+import CustomListbox from "../components/ListBox";
 import { useTheme } from "../ThemeContext";
 
+import CustomForms from "../components/CustomForms";
+
+import useCustomFormStore from "../store/useCustomFormStore";
 const CollectData = () => {
   const { classes, darkMode, toggleDarkMode } = useTheme();
+
+  const selectedForm = useCustomFormStore((s) => s.selectedForm);
+  const setSelectedForm = useCustomFormStore((s) => s.setSelectedForm);
+  const selectedDay = useCustomFormStore((s) => s.selectedDay);
+  const setSelectedDay = useCustomFormStore((s) => s.setSelectedDay);
+  const setShowFormModal = useCustomFormStore((s) => s.setShowFormModal);
+  const showFormModal = useCustomFormStore((s) => s.showFormModal);
+  const formData = useCustomFormStore((s) => s.formData);
+  const setCustomForms = useCustomFormStore((s) => s.setCustomForms);
+
   const [currentDate, setCurrentDate] = useState(new Date());
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("data"); // 'data', 'day', 'date', 'month'
   const [viewMode, setViewMode] = useState("month"); // 'month', 'year', 'week'
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
-  const [selectedForm, setSelectedForm] = useState("");
-  const [showFormModal, setShowFormModal] = useState(false);
-  const [selectedDay, setSelectedDay] = useState(null);
-  const [formData, setFormData] = useState({});
-  const [savedData, setSavedData] = useState({});
-  const [customForms, setCustomForms] = useState([
-    {
-      id: "daily_tasks",
-      name: "المهام اليومية",
-      fields: [
-        { name: "task", label: "المهمة", type: "text" },
-        {
-          name: "priority",
-          label: "الأولوية",
-          type: "select",
-          options: ["عالية", "متوسطة", "منخفضة"],
-        },
-        {
-          name: "status",
-          label: "الحالة",
-          type: "select",
-          options: ["مكتملة", "قيد التنفيذ", "مؤجلة"],
-        },
-      ],
-    },
-    {
-      id: "appointments",
-      name: "المواعيد",
-      fields: [
-        { name: "title", label: "العنوان", type: "text" },
-        { name: "time", label: "الوقت", type: "time" },
-        { name: "location", label: "المكان", type: "text" },
-        { name: "notes", label: "ملاحظات", type: "textarea" },
-      ],
-    },
-    {
-      id: "expenses",
-      name: "المصروفات",
-      fields: [
-        { name: "amount", label: "المبلغ", type: "number" },
-        {
-          name: "category",
-          label: "الفئة",
-          type: "select",
-          options: ["طعام", "مواصلات", "تسوق", "أخرى"],
-        },
-        { name: "description", label: "الوصف", type: "text" },
-      ],
-    },
-  ]);
-  const [showFormCreator, setShowFormCreator] = useState(false);
-  const [newFormName, setNewFormName] = useState("");
-  const [newFormFields, setNewFormFields] = useState([
-    { name: "", label: "", type: "text" },
-  ]);
+  const setFormData = useCustomFormStore((s) => s.setFormData);
+  const savedData = useCustomFormStore((s) => s.savedData);
+  const setSavedData = useCustomFormStore((s) => s.setSavedData);
+  const customForms = useCustomFormStore((s) => s.customForms);
+
 
   const monthNames = [
     "يناير",
@@ -102,7 +68,6 @@ const CollectData = () => {
     "السبت",
   ];
 
-  // البحث المتقدم
   const performAdvancedSearch = () => {
     if (!searchTerm.trim()) {
       setSearchResults([]);
@@ -197,7 +162,6 @@ const CollectData = () => {
     setShowSearchResults(true);
   };
 
-  // الحصول على أيام العرض حسب النمط
   const getDisplayDays = () => {
     if (showSearchResults) {
       return searchResults.map((result) => ({
@@ -321,146 +285,6 @@ const CollectData = () => {
     setFormData({});
   };
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    const dateKey = selectedDay.toDateString();
-    const currentForm = customForms.find((form) => form.id === selectedForm);
-
-    setSavedData((prev) => ({
-      ...prev,
-      [dateKey]: {
-        ...prev[dateKey],
-        [selectedForm]: {
-          ...prev[dateKey]?.[selectedForm],
-          [`entry_${Date.now()}`]: {
-            formName: currentForm.name,
-            ...formData,
-            timestamp: new Date().toLocaleString("ar-EG"),
-          },
-        },
-      },
-    }));
-
-    setShowFormModal(false);
-    setFormData({});
-  };
-
-  const renderFormField = (field) => {
-    const inputClasses = `w-full p-3 border rounded-lg ${classes.input} focus:ring-2 focus:ring-blue-500 focus:border-transparent`;
-
-    switch (field.type) {
-      case "select":
-        return (
-          <CustomSelect>
-            <select
-              key={field.name}
-              className={inputClasses}
-              value={formData[field.name] || ""}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  [field.name]: e.target.value,
-                }))
-              }
-              required
-            >
-              <option value="">اختر {field.label}</option>
-              {field.options.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </CustomSelect>
-        );
-      case "textarea":
-        return (
-          <textarea
-            key={field.name}
-            className={`${inputClasses} h-24 resize-none`}
-            placeholder={field.label}
-            value={formData[field.name] || ""}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, [field.name]: e.target.value }))
-            }
-            required
-          />
-        );
-      case "number":
-        return (
-          <input
-            key={field.name}
-            type="number"
-            className={inputClasses}
-            placeholder={field.label}
-            value={formData[field.name] || ""}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, [field.name]: e.target.value }))
-            }
-            required
-          />
-        );
-      case "time":
-        return (
-          <input
-            key={field.name}
-            type="time"
-            className={inputClasses}
-            value={formData[field.name] || ""}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, [field.name]: e.target.value }))
-            }
-            required
-          />
-        );
-      default:
-        return (
-          <input
-            key={field.name}
-            type="text"
-            className={inputClasses}
-            placeholder={field.label}
-            value={formData[field.name] || ""}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, [field.name]: e.target.value }))
-            }
-            required
-          />
-        );
-    }
-  };
-
-  const addNewFormField = () => {
-    setNewFormFields([...newFormFields, { name: "", label: "", type: "text" }]);
-  };
-
-  const removeFormField = (index) => {
-    if (newFormFields.length > 1) {
-      setNewFormFields(newFormFields.filter((_, i) => i !== index));
-    }
-  };
-
-  const createNewForm = () => {
-    if (
-      !newFormName.trim() ||
-      newFormFields.some((field) => !field.name || !field.label)
-    ) {
-      alert("يرجى ملء جميع الحقول المطلوبة");
-      return;
-    }
-
-    const newForm = {
-      id: `custom_${Date.now()}`,
-      name: newFormName,
-      fields: newFormFields.filter((field) => field.name && field.label),
-    };
-
-    setCustomForms([...customForms, newForm]);
-    setShowFormCreator(false);
-    setNewFormName("");
-    setNewFormFields([{ name: "", label: "", type: "text" }]);
-  };
-
   const getViewTitle = () => {
     switch (viewMode) {
       case "week":
@@ -514,17 +338,17 @@ const CollectData = () => {
                 { value: "day", label: "اليوم" },
                 { value: "date", label: "التاريخ" },
                 { value: "month", label: "الشهر" },
-              ].map((type) => (
+              ].map((fieldType) => (
                 <button
-                  key={type.value}
-                  onClick={() => setSearchType(type.value)}
+                  key={fieldType.value}
+                  onClick={() => setSearchType(fieldType.value)}
                   className={`px-3 py-2 rounded-lg text-sm transition-colors ${
-                    searchType === type.value
+                    searchType === fieldType.value
                       ? classes.buttonPrimary
                       : classes.buttonSecondary
                   }`}
                 >
-                  {type.label}
+                  {fieldType.label}
                 </button>
               ))}
             </div>
@@ -532,7 +356,6 @@ const CollectData = () => {
             {/* Search Input */}
             <div className="flex gap-2">
               <div className="relative flex-1">
-                
                 <input
                   type="text"
                   placeholder={
@@ -576,7 +399,8 @@ const CollectData = () => {
           <div className="space-y-4">
             {/* View Mode Selection */}
             <div
-              className={`grid grid-cols-3 gap-1 p-1 ${
+              // grid grid-cols-3 gap-1 p-1 $
+              className={`grid grid-cols-3  ${
                 darkMode ? "bg-gray-700" : "bg-gray-100"
               } rounded-lg`}
             >
@@ -602,7 +426,14 @@ const CollectData = () => {
               ))}
             </div>
             {/* Form Selection */}
-            <CustomSelect>
+
+            <CustomListbox
+              selectedForm={selectedForm}
+              setSelectedForm={setSelectedForm}
+              customForms={customForms}
+            />
+
+            {/* <CustomSelect>
               <select
                 value={selectedForm}
                 onChange={(e) => setSelectedForm(e.target.value)}
@@ -611,11 +442,12 @@ const CollectData = () => {
                 <option value="">اختر نوع النموذج</option>
                 {customForms.map((form) => (
                   <option key={form.id} value={form.id}>
-                    {form.name}
+                    {form.title}
                   </option>
                 ))}
               </select>
-            </CustomSelect>
+            </CustomSelect> */}
+            {/* <ListBox /> */}
           </div>
         </div>
       </div>
@@ -667,7 +499,8 @@ const CollectData = () => {
               {weekDays.map((day) => (
                 <div
                   key={day}
-                  className={`${classes.tableHeader} p-3 text-center font-medium rounded-lg`}
+                  className={`${classes.tableHeader} 
+                  p-3 text-center font-medium rounded-lg`}
                 >
                   {day}
                 </div>
@@ -746,224 +579,7 @@ const CollectData = () => {
       </div>
 
       {/* Form Modal */}
-      {showFormModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div
-            className={`${classes.cardBg} rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto`}
-          >
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className={`text-xl font-bold ${classes.textPrimary}`}>
-                  {customForms.find((f) => f.id === selectedForm)?.name} -{" "}
-                  {selectedDay?.toLocaleDateString("ar-EG")}
-                </h3>
-                <button
-                  onClick={() => setShowFormModal(false)}
-                  className={`${classes.buttonSecondary} p-2 rounded-lg transition-colors`}
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <form onSubmit={handleFormSubmit} className="space-y-4">
-                {customForms
-                  .find((f) => f.id === selectedForm)
-                  ?.fields.map((field) => (
-                    <div key={field.name}>
-                      <label
-                        className={`block text-sm font-medium mb-2 ${classes.textSecondary}`}
-                      >
-                        {field.label}
-                      </label>
-                      {renderFormField(field)}
-                    </div>
-                  ))}
-
-                <button
-                  type="submit"
-                  className={`${classes.buttonPrimary} w-full py-3 rounded-lg flex items-center justify-center gap-2 transition-colors`}
-                >
-                  <Save className="w-5 h-5" />
-                  حفظ
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Form Creator Modal */}
-      {showFormCreator && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div
-            className={`${classes.cardBg} rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto`}
-          >
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className={`text-xl font-bold ${classes.textPrimary}`}>
-                  إنشاء نموذج جديد
-                </h3>
-                <button
-                  onClick={() => setShowFormCreator(false)}
-                  className={`${classes.buttonSecondary} p-2 rounded-lg transition-colors`}
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="space-y-6">
-                <div>
-                  <label
-                    className={`block text-sm font-medium mb-2 ${classes.textSecondary}`}
-                  >
-                    اسم النموذج
-                  </label>
-                  <input
-                    type="text"
-                    value={newFormName}
-                    onChange={(e) => setNewFormName(e.target.value)}
-                    className={`${classes.input} w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500`}
-                    placeholder="مثال: تتبع التمارين"
-                  />
-                </div>
-
-                <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <h4
-                      className={`text-lg font-medium ${classes.textPrimary}`}
-                    >
-                      حقول النموذج
-                    </h4>
-                    <button
-                      type="button"
-                      onClick={addNewFormField}
-                      className={`${classes.buttonPrimary} px-4 py-2 rounded-lg flex items-center gap-2 transition-colors`}
-                    >
-                      <Plus className="w-4 h-4" />
-                      إضافة حقل
-                    </button>
-                  </div>
-
-                  {newFormFields.map((field, index) => (
-                    <div
-                      key={index}
-                      className={`${classes.cardBg} ${classes.cardBorder} border rounded-lg p-4 mb-4`}
-                    >
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                          <label
-                            className={`block text-sm font-medium mb-2 ${classes.textSecondary}`}
-                          >
-                            اسم الحقل
-                          </label>
-                          <input
-                            type="text"
-                            value={field.name}
-                            onChange={(e) => {
-                              const updated = [...newFormFields];
-                              updated[index].name = e.target.value;
-                              setNewFormFields(updated);
-                            }}
-                            className={`${classes.input} w-full p-2 border rounded-lg`}
-                            placeholder="مثال: exercise_name"
-                          />
-                        </div>
-
-                        <div>
-                          <label
-                            className={`block text-sm font-medium mb-2 ${classes.textSecondary}`}
-                          >
-                            التسمية
-                          </label>
-                          <input
-                            type="text"
-                            value={field.label}
-                            onChange={(e) => {
-                              const updated = [...newFormFields];
-                              updated[index].label = e.target.value;
-                              setNewFormFields(updated);
-                            }}
-                            className={`${classes.input} w-full p-2 border rounded-lg`}
-                            placeholder="مثال: اسم التمرين"
-                          />
-                        </div>
-
-                        <div>
-                          <label
-                            className={`block text-sm font-medium mb-2 ${classes.textSecondary}`}
-                          >
-                            النوع
-                          </label>
-                          <div className="flex gap-2">
-                            <CustomSelect>
-                              <select
-                                value={field.type}
-                                onChange={(e) => {
-                                  const updated = [...newFormFields];
-                                  updated[index].type = e.target.value;
-                                  setNewFormFields(updated);
-                                }}
-                                className={`${classes.input} flex-1 p-2 border rounded-lg`}
-                              >
-                                <option value="text">نص</option>
-                                <option value="number">رقم</option>
-                                <option value="time">وقت</option>
-                                <option value="textarea">نص طويل</option>
-                                <option value="select">قائمة</option>
-                              </select>
-                            </CustomSelect>
-
-                            {newFormFields.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => removeFormField(index)}
-                                className="text-red-500 hover:text-red-700 p-2"
-                              >
-                                <X className="w-4 h-4" />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {field.type === "select" && (
-                        <div className="mt-4">
-                          <label
-                            className={`block text-sm font-medium mb-2 ${classes.textSecondary}`}
-                          >
-                            الخيارات (مفصولة بفاصلة)
-                          </label>
-                          <input
-                            type="text"
-                            placeholder="خيار 1, خيار 2, خيار 3"
-                            onChange={(e) => {
-                              const updated = [...newFormFields];
-                              updated[index].options = e.target.value
-                                .split(",")
-                                .map((opt) => opt.trim())
-                                .filter(Boolean);
-                              setNewFormFields(updated);
-                            }}
-                            className={`${classes.input} w-full p-2 border rounded-lg`}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                <button
-                  onClick={createNewForm}
-                  className={`${classes.buttonPrimary} w-full py-3 rounded-lg flex items-center justify-center gap-2 transition-colors`}
-                >
-                  <Save className="w-5 h-5" />
-                  إنشاء النموذج
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {showFormModal && <CustomForms />}
 
       {/* Data Display */}
       {Object.keys(savedData).length > 0 && (

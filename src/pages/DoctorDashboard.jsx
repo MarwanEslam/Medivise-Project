@@ -1,6 +1,7 @@
 import React, { useState, useContext, createContext } from "react";
 import {
   Users,
+  Brain,
   FileText,
   BarChart3,
   PlusCircle,
@@ -14,7 +15,9 @@ import {
   Moon,
   Sun,
 } from "lucide-react";
-import AdvancedFormManager from "../components/AdvancedFormManager";
+
+import EnhancedFormBuilder from "../components/x";
+
 import { useTheme } from "../ThemeContext";
 const DoctorDashboard = () => {
   const { classes, darkMode, toggleDarkMode } = useTheme();
@@ -144,87 +147,7 @@ const DoctorDashboard = () => {
     },
   ]);
 
-  const [showFormBuilder, setShowFormBuilder] = useState(false);
-  const [currentForm, setCurrentForm] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
-
-  // Form Builder State
-  const [formTitle, setFormTitle] = useState("");
-  const [formDescription, setFormDescription] = useState("");
-  const [formFields, setFormFields] = useState([]);
-
-  const resetFormBuilder = () => {
-    setFormTitle("");
-    setFormDescription("");
-    setFormFields([]);
-    setCurrentForm(null);
-  };
-
-  const addField = () => {
-    const newField = {
-      id: Date.now(),
-      type: "text",
-      label: "",
-      required: false,
-      options: [],
-    };
-    setFormFields([...formFields, newField]);
-  };
-
-  const updateField = (fieldId, updates) => {
-    setFormFields(
-      formFields.map((field) =>
-        field.id === fieldId ? { ...field, ...updates } : field
-      )
-    );
-  };
-
-  const removeField = (fieldId) => {
-    setFormFields(formFields.filter((field) => field.id !== fieldId));
-  };
-
-  const saveForm = () => {
-    if (!formTitle.trim() || formFields.length === 0) {
-      alert("يرجى إدخال عنوان النموذج وإضافة حقل واحد على الأقل");
-      return;
-    }
-
-    const newForm = {
-      id: currentForm ? currentForm.id : Date.now(),
-      title: formTitle,
-      description: formDescription,
-      fields: formFields,
-      createdDate: currentForm
-        ? currentForm.createdDate
-        : new Date().toISOString().split("T")[0],
-    };
-
-    if (currentForm) {
-      setForms(
-        forms.map((form) => (form.id === currentForm.id ? newForm : form))
-      );
-    } else {
-      setForms([...forms, newForm]);
-    }
-
-    setShowFormBuilder(false);
-    resetFormBuilder();
-  };
-
-  const editForm = (form) => {
-    setCurrentForm(form);
-    setFormTitle(form.title);
-    setFormDescription(form.description);
-    setFormFields([...form.fields]);
-    setShowFormBuilder(true);
-  };
-
-  const deleteForm = (formId) => {
-    if (window.confirm("هل أنت متأكد من حذف هذا النموذج؟")) {
-      setForms(forms.filter((form) => form.id !== formId));
-      setResponses(responses.filter((response) => response.formId !== formId));
-    }
-  };
 
   // Statistics
   const totalUsers = users.length;
@@ -240,70 +163,6 @@ const DoctorDashboard = () => {
     >
       {/* Stats Cards */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div
-            className={`rounded-xl shadow-lg p-6 border transition-colors duration-300 ${classes.cardBg} ${classes.cardBorder}`}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className={`text-sm font-medium ${classes.textSecondary}`}>
-                  إجمالي المستخدمين
-                </p>
-                <p className="text-3xl font-bold text-blue-600">{totalUsers}</p>
-              </div>
-              <Users className="h-10 w-10 text-blue-500" />
-            </div>
-          </div>
-
-          <div
-            className={`rounded-xl shadow-lg p-6 border transition-colors duration-300 ${classes.cardBg} ${classes.cardBorder}`}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className={`text-sm font-medium ${classes.textSecondary}`}>
-                  المرضى
-                </p>
-                <p className="text-3xl font-bold text-red-600">
-                  {patientsCount}
-                </p>
-              </div>
-              <User className="h-10 w-10 text-red-500" />
-            </div>
-          </div>
-
-          <div
-            className={`rounded-xl shadow-lg p-6 border transition-colors duration-300 ${classes.cardBg} ${classes.cardBorder}`}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className={`text-sm font-medium ${classes.textSecondary}`}>
-                  الرياضيين
-                </p>
-                <p className="text-3xl font-bold text-green-600">
-                  {athletesCount}
-                </p>
-              </div>
-              <Activity className="h-10 w-10 text-green-500" />
-            </div>
-          </div>
-
-          <div
-            className={`rounded-xl shadow-lg p-6 border transition-colors duration-300 ${classes.cardBg} ${classes.cardBorder}`}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className={`text-sm font-medium ${classes.textSecondary}`}>
-                  النماذج
-                </p>
-                <p className="text-3xl font-bold text-purple-600">
-                  {totalForms}
-                </p>
-              </div>
-              <FileText className="h-10 w-10 text-purple-500" />
-            </div>
-          </div>
-        </div>
-
         {/* Navigation Tabs */}
         <div
           className={`rounded-xl shadow-lg mb-6 transition-colors duration-300 ${classes.cardBg}`}
@@ -334,161 +193,250 @@ const DoctorDashboard = () => {
                 <FileText className="inline-block ml-2 h-5 w-5" />
                 النماذج
               </button>
+              <button
+                onClick={() => setActiveTab("ai")}
+                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ${
+                  activeTab === "ai"
+                    ? "border-blue-500 text-blue-600"
+                    : `border-transparent ${classes.tabs}`
+                }`}
+              >
+                <Brain className="inline-block ml-2 h-5 w-5" />
+                الذكاء الاصطناعي
+              </button>
             </nav>
           </div>
         </div>
 
         {/* Content based on active tab */}
         {activeTab === "users" && (
-          <div
-            className={`rounded-xl shadow-lg p-6 transition-colors duration-300 ${
-              darkMode ? "bg-gray-800" : "bg-white"
-            }`}
-          >
-            <h2
-              className={`text-xl font-bold mb-6 ${
-                darkMode ? "text-white" : "text-gray-900"
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div
+                className={`rounded-xl shadow-lg p-6 border transition-colors duration-300 ${classes.cardBg} ${classes.cardBorder}`}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p
+                      className={`text-sm font-medium ${classes.textSecondary}`}
+                    >
+                      إجمالي المستخدمين
+                    </p>
+                    <p className="text-3xl font-bold text-blue-600">
+                      {totalUsers}
+                    </p>
+                  </div>
+                  <Users className="h-10 w-10 text-blue-500" />
+                </div>
+              </div>
+
+              <div
+                className={`rounded-xl shadow-lg p-6 border transition-colors duration-300 ${classes.cardBg} ${classes.cardBorder}`}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p
+                      className={`text-sm font-medium ${classes.textSecondary}`}
+                    >
+                      المرضى
+                    </p>
+                    <p className="text-3xl font-bold text-red-600">
+                      {patientsCount}
+                    </p>
+                  </div>
+                  <User className="h-10 w-10 text-red-500" />
+                </div>
+              </div>
+
+              <div
+                className={`rounded-xl shadow-lg p-6 border transition-colors duration-300 ${classes.cardBg} ${classes.cardBorder}`}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p
+                      className={`text-sm font-medium ${classes.textSecondary}`}
+                    >
+                      الرياضيين
+                    </p>
+                    <p className="text-3xl font-bold text-green-600">
+                      {athletesCount}
+                    </p>
+                  </div>
+                  <Activity className="h-10 w-10 text-green-500" />
+                </div>
+              </div>
+
+              <div
+                className={`rounded-xl shadow-lg p-6 border transition-colors duration-300 ${classes.cardBg} ${classes.cardBorder}`}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p
+                      className={`text-sm font-medium ${classes.textSecondary}`}
+                    >
+                      النماذج
+                    </p>
+                    <p className="text-3xl font-bold text-purple-600">
+                      {totalForms}
+                    </p>
+                  </div>
+                  <FileText className="h-10 w-10 text-purple-500" />
+                </div>
+              </div>
+            </div>
+            <div
+              className={`rounded-xl shadow-lg p-6 transition-colors duration-300 ${
+                darkMode ? "bg-gray-800" : "bg-white"
               }`}
             >
-              قائمة المستخدمين
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className={`${darkMode ? "bg-gray-700" : "bg-gray-50"}`}>
-                  <tr>
-                    <th
-                      className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${
-                        darkMode ? "text-gray-300" : "text-gray-500"
-                      }`}
-                    >
-                      الاسم
-                    </th>
-                    <th
-                      className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${
-                        darkMode ? "text-gray-300" : "text-gray-500"
-                      }`}
-                    >
-                      السن
-                    </th>
-                    <th
-                      className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${
-                        darkMode ? "text-gray-300" : "text-gray-500"
-                      }`}
-                    >
-                      النوع
-                    </th>
-                    <th
-                      className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${
-                        darkMode ? "text-gray-300" : "text-gray-500"
-                      }`}
-                    >
-                      الجنس
-                    </th>
-                    <th
-                      className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${
-                        darkMode ? "text-gray-300" : "text-gray-500"
-                      }`}
-                    >
-                      المحافظة
-                    </th>
-                    <th
-                      className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${
-                        darkMode ? "text-gray-300" : "text-gray-500"
-                      }`}
-                    >
-                      تاريخ الانضمام
-                    </th>
-                    <th
-                      className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${
-                        darkMode ? "text-gray-300" : "text-gray-500"
-                      }`}
-                    >
-                      الإجراءات
-                    </th>
-                  </tr>
-                </thead>
-                <tbody
-                  className={`divide-y transition-colors duration-300 ${
-                    darkMode
-                      ? "bg-gray-800 divide-gray-700"
-                      : "bg-white divide-gray-200"
-                  }`}
-                >
-                  {users.map((user) => (
-                    <tr
-                      key={user.id}
-                      className={`transition-colors duration-200 ${
-                        darkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"
-                      }`}
-                    >
-                      <td
-                        className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${
-                          darkMode ? "text-white" : "text-gray-900"
-                        }`}
-                      >
-                        {user.name}
-                      </td>
-                      <td
-                        className={`px-6 py-4 whitespace-nowrap text-sm ${
+              <h2
+                className={`text-xl font-bold mb-6 ${
+                  darkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                قائمة المستخدمين
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead
+                    className={`${darkMode ? "bg-gray-700" : "bg-gray-50"}`}
+                  >
+                    <tr>
+                      <th
+                        className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${
                           darkMode ? "text-gray-300" : "text-gray-500"
                         }`}
                       >
-                        {user.age}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            user.type === "مريض"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-green-100 text-green-800"
-                          }`}
-                        >
-                          {user.type}
-                        </span>
-                      </td>
-                      <td
-                        className={`px-6 py-4 whitespace-nowrap text-sm ${
+                        الاسم
+                      </th>
+                      <th
+                        className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${
                           darkMode ? "text-gray-300" : "text-gray-500"
                         }`}
                       >
-                        {user.gender}
-                      </td>
-                      <td
-                        className={`px-6 py-4 whitespace-nowrap text-sm ${
+                        السن
+                      </th>
+                      <th
+                        className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${
                           darkMode ? "text-gray-300" : "text-gray-500"
                         }`}
                       >
-                        <MapPin className="inline-block ml-1 h-4 w-4" />
-                        {user.governorate}
-                      </td>
-                      <td
-                        className={`px-6 py-4 whitespace-nowrap text-sm ${
+                        النوع
+                      </th>
+                      <th
+                        className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${
                           darkMode ? "text-gray-300" : "text-gray-500"
                         }`}
                       >
-                        {user.joinDate}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button
-                          onClick={() => setSelectedUser(user)}
-                          className={`ml-3 transition-colors duration-200 ${
-                            darkMode
-                              ? "text-blue-400 hover:text-blue-300"
-                              : "text-blue-600 hover:text-blue-900"
-                          }`}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </button>
-                      </td>
+                        الجنس
+                      </th>
+                      <th
+                        className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${
+                          darkMode ? "text-gray-300" : "text-gray-500"
+                        }`}
+                      >
+                        المحافظة
+                      </th>
+                      <th
+                        className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${
+                          darkMode ? "text-gray-300" : "text-gray-500"
+                        }`}
+                      >
+                        تاريخ الانضمام
+                      </th>
+                      <th
+                        className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${
+                          darkMode ? "text-gray-300" : "text-gray-500"
+                        }`}
+                      >
+                        الإجراءات
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody
+                    className={`divide-y transition-colors duration-300 ${
+                      darkMode
+                        ? "bg-gray-800 divide-gray-700"
+                        : "bg-white divide-gray-200"
+                    }`}
+                  >
+                    {users.map((user) => (
+                      <tr
+                        key={user.id}
+                        className={`transition-colors duration-200 ${
+                          darkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"
+                        }`}
+                      >
+                        <td
+                          className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${
+                            darkMode ? "text-white" : "text-gray-900"
+                          }`}
+                        >
+                          {user.name}
+                        </td>
+                        <td
+                          className={`px-6 py-4 whitespace-nowrap text-sm ${
+                            darkMode ? "text-gray-300" : "text-gray-500"
+                          }`}
+                        >
+                          {user.age}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              user.type === "مريض"
+                                ? "bg-red-100 text-red-800"
+                                : "bg-green-100 text-green-800"
+                            }`}
+                          >
+                            {user.type}
+                          </span>
+                        </td>
+                        <td
+                          className={`px-6 py-4 whitespace-nowrap text-sm ${
+                            darkMode ? "text-gray-300" : "text-gray-500"
+                          }`}
+                        >
+                          {user.gender}
+                        </td>
+                        <td
+                          className={`px-6 py-4 whitespace-nowrap text-sm ${
+                            darkMode ? "text-gray-300" : "text-gray-500"
+                          }`}
+                        >
+                          <MapPin className="inline-block ml-1 h-4 w-4" />
+                          {user.governorate}
+                        </td>
+                        <td
+                          className={`px-6 py-4 whitespace-nowrap text-sm ${
+                            darkMode ? "text-gray-300" : "text-gray-500"
+                          }`}
+                        >
+                          {user.joinDate}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => setSelectedUser(user)}
+                            className={`ml-3 transition-colors duration-200 ${
+                              darkMode
+                                ? "text-blue-400 hover:text-blue-300"
+                                : "text-blue-600 hover:text-blue-900"
+                            }`}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          </>
         )}
 
-        {activeTab === "forms" && <AdvancedFormManager />}
+        {/* {activeTab === "forms" && <AdvancedFormManager />} */}
+        {activeTab === "forms" && <EnhancedFormBuilder />}
       </div>
 
       {/* User Details Modal */}
@@ -523,7 +471,7 @@ const DoctorDashboard = () => {
               </button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-3 mb-6">
               <div className="flex justify-between">
                 <span
                   className={`font-medium ${
@@ -612,6 +560,93 @@ const DoctorDashboard = () => {
                   {selectedUser.joinDate}
                 </span>
               </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-600">
+              <button
+                onClick={() => {
+                  // Handle go to chat functionality
+                  console.log("Navigate to chat with", selectedUser.name);
+                  setSelectedUser(null);
+                }}
+                className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2 space-x-reverse ${
+                  darkMode
+                    ? "bg-blue-600 hover:bg-blue-700 text-white"
+                    : "bg-blue-500 hover:bg-blue-600 text-white"
+                }`}
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.418 8-9 8a9.013 9.013 0 01-5.038-1.5c-1.462.426-3.001.8-4.638 1.148a.5.5 0 01-.602-.624l.635-2.54A8.99 8.99 0 013 12c0-4.418 4.477-8 9-8s9 3.582 9 8z"
+                  />
+                </svg>
+                <span>انتقال للدردشة مع المريض</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  // Handle show data functionality
+                  console.log("Show data for", selectedUser.name);
+                  setSelectedUser(null);
+                }}
+                className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2 space-x-reverse ${
+                  darkMode
+                    ? "bg-green-600 hover:bg-green-700 text-white"
+                    : "bg-green-500 hover:bg-green-600 text-white"
+                }`}
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+                <span>عرض وتقديم البيانات</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  // Handle build plan functionality
+                  console.log("Build plan for", selectedUser.name);
+                  setSelectedUser(null);
+                }}
+                className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2 space-x-reverse ${
+                  darkMode
+                    ? "bg-purple-600 hover:bg-purple-700 text-white"
+                    : "bg-purple-500 hover:bg-purple-600 text-white"
+                }`}
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                  />
+                </svg>
+                <span>انتقال لبناء خطة</span>
+              </button>
             </div>
           </div>
         </div>

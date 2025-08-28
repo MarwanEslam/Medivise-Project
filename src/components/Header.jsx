@@ -16,9 +16,11 @@ import {
 } from "lucide-react";
 
 const NAVIGATION_ITEMS = [
+  
   { path: "/", label: "الرئيسية", icon: Combine },
   { path: "/data/collect", label: "جمع البيانات", icon: CalendarDays },
   { path: "/doctor/dashboard", label: "لوحة تحكم الطبيب", icon: Activity },
+  { path: "/ai", label: "الذكاء الاصطناعي", icon: Brain },
   { path: "/community", label: "المجتمع", icon: MessagesSquare },
   { path: "/info", label: "المعلومات", icon: BookOpenCheck },
 ];
@@ -37,7 +39,7 @@ const Header = ({ isLoading = false }) => {
   return (
     <header
       dir="rtl"
-      className={`shadow-lg border-b transition-all duration-300 ${classes.cardBg} ${classes.cardBorder} sticky top-0 z-40 ${loadingClass}`}
+      className={`shadow-lg border-b transition-all duration-300 ${classes.cardBg} ${classes.cardBorder} fixed top-0 left-0 w-full z-40 ${loadingClass}`}
       role="banner"
     >
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -68,7 +70,7 @@ const Header = ({ isLoading = false }) => {
                 className={`
     flex items-center px-2 xl:px-3 py-1 md:py-2 rounded-lg text-sm xl:text-base 
     transition-all duration-200 
-    ${path === location.pathname ? classes.buttonPrimary : ""} 
+    ${path === location.pathname ? "text-blue-600" : classes.textPrimary} 
     disabled:opacity-50 disabled:cursor-not-allowed
   `}
               >
